@@ -23,3 +23,12 @@ func (t *tracer) Trace(a ...interface{}) {
 	t.out.Write([]byte(fmt.Sprint(a...)))
 	t.out.Write([]byte("\n"))
 }
+
+// Off returns new tracer doing nothing
+func Off() Tracer {
+	return &nilTracer{}
+}
+
+type nilTracer struct{}
+
+func (t *nilTracer) Trace(a ...interface{}) {}

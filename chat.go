@@ -5,8 +5,11 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/aknorsh/my-goblueprints/trace"
 )
 
 type templateHandler struct {
@@ -28,9 +31,14 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	var addr = flag.String("addr", ":8080", "Address of application")
+	var dev = flag.Bool("dev", false, "Activate dev-mode")
 	flag.Parse()
 
 	r := NewRoom()
+	if *dev {
+		r.tracer = trace.New(os.Stdout)
+	}
+
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
 
