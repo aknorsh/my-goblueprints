@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/objx"
 )
 
-// Room is a room for chatting
+// Room represents a room for chatting
 type Room struct {
 	forward chan *message
 	join    chan *client
@@ -77,12 +77,15 @@ func (r *Room) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		log.Fatal("Failed to get cookie.", err)
 		return
 	}
+
 	client := &client{
 		socket:   socket,
 		send:     make(chan *message, messageBufferSize),
 		room:     r,
 		userData: objx.MustFromBase64(authCookie.Value),
 	}
+
+	// 入退室&読み書きをchannelで表現
 	r.join <- client
 	defer func() { r.leave <- client }()
 	go client.write()

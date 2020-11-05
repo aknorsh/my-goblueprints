@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/objx"
 )
 
+// 認証を強いるためのMiddleware
 type authHandler struct {
 	next http.Handler
 }
@@ -35,7 +36,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	segs := strings.Split(r.URL.Path, "/")
 	action := segs[2]
 	provider := segs[3]
+
 	switch action {
+
 	case "login":
 		provider, err := gomniauth.Provider(provider)
 		if err != nil {
@@ -43,10 +46,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		loginURL, err := provider.GetBeginAuthURL(nil, nil)
 		if err != nil {
-			log.Fatalln("ERROR while GetBeginAuthURL is called:", provider, "-", err)
+			log.Fatalln("ERROR while calling GetBeginAuthURL:", provider, "-", err)
 		}
 		w.Header().Set("Location", loginURL)
 		w.WriteHeader(http.StatusTemporaryRedirect)
+
 	case "callback":
 		provider, err := gomniauth.Provider(provider)
 		if err != nil {
@@ -69,6 +73,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			Path:  "/"})
 		w.Header()["Location"] = []string{"/chat"}
 		w.WriteHeader(http.StatusTemporaryRedirect)
+
 	default:
 		w.WriteHeader(http.StatusNotFound)
 		fmt.Fprintf(w, "Action %s is not supported.", action)
