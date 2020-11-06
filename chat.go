@@ -15,6 +15,12 @@ import (
 	"github.com/stretchr/objx"
 )
 
+var avatars Avatar = TryAvatar{
+	UseFileSystemAvatar,
+	UseAuthAvatar,
+	UseGravatar,
+}
+
 type templateHandler struct {
 	once     sync.Once
 	filename string
@@ -54,7 +60,7 @@ func main() {
 			"http://localhost:8080/auth/callback/google"),
 	)
 
-	r := NewRoom(UseFileSystemAvatar)
+	r := NewRoom()
 	if *dev {
 		r.tracer = trace.New(os.Stdout)
 	}
